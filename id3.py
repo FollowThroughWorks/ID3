@@ -24,56 +24,51 @@ count = 0
 
 
 
-#purpose = "read"
-purpose = "do"
+with open(file_mp3,"rb") as mp3_file:
 
-with open(file_mp3,"rb") as f:
-    id3_identifier = f.read(3)
+    # Header
+    id3_identifier = mp3_file.read(3)
     print("Identifier: " + id3_identifier.decode("utf-8"))
-    id3_major_version = hex_to_num(f.read(1))
-    id3_revision_number = hex_to_num(f.read(1))
+
+    id3_major_version = hex_to_num(mp3_file.read(1))
+    id3_revision_number = hex_to_num(mp3_file.read(1))
     print("Version: " + str(id3_major_version) + "." + str(id3_revision_number))
-    id3_flags = f.read(1)
+
+    id3_flags = mp3_file.read(1)
     print("Flags: " + str(id3_flags))
+
     NUM_OF_SIZE_BYTES = 4
-    id3_size_bytes_list = [f.read(1) for byte in range(NUM_OF_SIZE_BYTES)] #want to read one byte at a time
+    id3_size_bytes_list = [mp3_file.read(1) for byte in range(NUM_OF_SIZE_BYTES)] #want to read one byte at a time
     id3_size = calc_tag_size(id3_size_bytes_list)
     print("Size: " + str(id3_size))
 
-    if(purpose=="read"):
-        byte = f.seek(5000,1)
-        byte = f.read(1)
-        while count < 2000:
-            print(byte)
-            byte = f.read(1)
-            count+=1
-    if(purpose=="do"):
-        while count < 25:
-            #Space
-            print("")
-            # Frame ID
+    # Frames
+
+    while count < 25:
+        #Space
+        print("")
+        # Frame ID
+        frame_id = mp3_file.read(4).decode("utf-8")
+        print("Flag ID: " + frame_id)
+        # Length
+        length_bytes = mp3_file.read(4)
+        length = int(binascii.hexlify(length_bytes),16) - 1
+        print("Length bytes: " + str(length_bytes))
+        print("Length: " + str(length))
+        # Flags
+        frame_flags = mp3_file.read(3)
+        print("Frame flags: " + str(frame_flags))
+        # Frame info
+        if(length > 1000):
+            mp3_file.seek(length,1)
+            print("Skipped: too large")
+        else:
             try:
-                frame_id = f.read(4).decode("utf-8")
-                print("ID: " + frame_id)
+                info = mp3_file.read(length).decode("utf-8")
             except(UnicodeDecodeError):
-                print("Yo I don't know what this is")
-                print(f.read(4))
-            # Length
-            length_bytes = f.read(4)
-            length = int(binascii.hexlify(length_bytes),16) - 1
-            print("Length bytes: " + str(length_bytes))
-            print("Length: " + str(length))
-            # Flags
-            frame_flags = f.read(3)
-            print("Frame flags: " + str(frame_flags))
-            # Frame info
-            if(length > 1000):
-                f.seek(length,1)
-                print("Skipped: too large")
-            else:
-                info = f.read(length).decode("utf-8")
-                print(info)
-            count+= 1
+                info = mp3_file.read(length).decode("utf-16")
+            print(info)
+        count+= 1
 
 
 
