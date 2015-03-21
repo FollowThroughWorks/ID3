@@ -1,5 +1,25 @@
 import binascii
 
+'''
+###
+1) Identify tag as ID3v2.3
+    An ID3v2 tag can be detected with the following pattern:
+    $49 44 33 yy yy xx zz zz zz zz
+    Where yy is less than $FF, xx is the 'flags' byte and zz is less than $80.
+
+2) Use flag in head to identify if there is an extended header
+    The version is followed by one the ID3v2 flags field, of which currently only three flags are used.
+    a - Unsynchronisation
+    Bit 7 in the 'ID3v2 flags' indicates whether or not unsynchronisation is used (see section 5 for details); a set bit indicates usage.
+    b - Extended header
+    The second bit (bit 6) indicates whether or not the header is followed by an extended header. The extended header is described in section 3.2.
+    c - Experimental indicator
+    The third bit (bit 5) should be used as an 'experimental indicator'. This flag should always be set when the tag is in an experimental stage.
+
+3) Work on frames
+###
+'''
+
 file_mp3 = r"C:\Users\Mike\Desktop\Pictures of Success.mp3"
 #file_mp3 = r"C:\Users\Mike\Desktop\Get Up.mp3"
 file_m4a = r"C:\Users\Mike\Desktop\On Distant Shores.m4a"
