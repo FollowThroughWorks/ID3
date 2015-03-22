@@ -42,8 +42,6 @@ def calc_tag_size(list_of_size_bytes):
 
 count = 0
 
-
-
 with open(file_mp3,"rb") as mp3_file:
 
     # Header
@@ -54,13 +52,17 @@ with open(file_mp3,"rb") as mp3_file:
     id3_revision_number = hex_to_num(mp3_file.read(1))
     print("Version: " + str(id3_major_version) + "." + str(id3_revision_number))
 
-    id3_flags = mp3_file.read(1)
-    print("Flags: " + str(id3_flags))
+    flag_byte = mp3_file.read(1)
+    extended_header_bit = ord(flag_byte) & 0b01000000
 
     NUM_OF_SIZE_BYTES = 4
     id3_size_bytes_list = [mp3_file.read(1) for byte in range(NUM_OF_SIZE_BYTES)] #want to read one byte at a time
     id3_size = calc_tag_size(id3_size_bytes_list)
     print("Size: " + str(id3_size))
+
+    # Extended Header
+    if(extended_header_bit == 1):
+        pass # Insert code here
 
     # Frames
 
